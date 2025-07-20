@@ -1,8 +1,10 @@
 import SettingsModal from "@/components/SettingsModal";
 import { useSettings } from "@/contexts/SettingsContext";
 import * as Haptics from "expo-haptics";
-import { activateKeepAwake, deactivateKeepAwake } from "expo-keep-awake";
+import { activateKeepAwakeAsync, deactivateKeepAwake } from "expo-keep-awake";
+import * as Notifications from "expo-notifications";
 import React, { useEffect, useRef, useState } from "react";
+import { AppState } from "react-native";
 import { AnimatedCircularProgress } from "react-native-circular-progress";
 import {
   ButtonCol,
@@ -18,10 +20,11 @@ import {
   TimerText,
   TitleApp,
 } from "./HomeScreen.styles";
-
-interface ButtonProps {
-  disabled?: boolean;
-}
+// Configuração do canal de notificação para Android
+Notifications.setNotificationChannelAsync("default", {
+  name: "Pomodoro",
+  importance: Notifications.AndroidImportance.HIGH,
+});
 
 export default function HomeScreen() {
   const { settings } = useSettings();
@@ -38,17 +41,57 @@ export default function HomeScreen() {
 
   const [showModal, setShowModal] = useState(false);
 
+  // Listener para notificação ao minimizar
+  useEffect(() => {
+    const subscription = AppState.addEventListener("change", (nextState) => {
+      if (nextState === "background" && isRunning && secondsLeft > 0) {
+        schedulePomodoroNotification(secondsLeft, mode);
+      }
+      if (nextState === "active") {
+        Notifications.cancelAllScheduledNotificationsAsync();
+      }
+    });
+    return () => {
+      subscription.remove();
+    };
+  }, [isRunning, secondsLeft, mode]);
+
+  // Notificação persistente
+  async function schedulePomodoroNotification(seconds: number, mode: string) {
+    await Notifications.cancelAllScheduledNotificationsAsync();
+    if (seconds > 0) {
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title:
+            mode === "work"
+              ? "Pomodoro em andamento"
+              : mode === "short"
+              ? "Pausa Curta"
+              : "Pausa Longa",
+          body: `Tempo restante: ${Math.floor(seconds / 60)}:${(seconds % 60)
+            .toString()
+            .padStart(2, "0")}`,
+          sound: true,
+        },
+        trigger: { seconds, repeats: false, channelId: "default" },
+      });
+    }
+  }
+
   // Bloqueio de tela: mantém acordado enquanto timer está rodando
   useEffect(() => {
     if (isRunning) {
-      activateKeepAwake();
+      activateKeepAwakeAsync();
+      schedulePomodoroNotification(secondsLeft, mode);
     } else {
       deactivateKeepAwake();
+      Notifications.cancelAllScheduledNotificationsAsync();
     }
     return () => {
       deactivateKeepAwake();
+      Notifications.cancelAllScheduledNotificationsAsync();
     };
-  }, [isRunning]);
+  }, [isRunning, secondsLeft, mode]);
 
   // Atualiza o timer se o usuário mudar as configurações
   useEffect(() => {
@@ -222,6 +265,7 @@ export default function HomeScreen() {
       </ButtonCol>
 
       <SettingsModal visible={showModal} onClose={() => setShowModal(false)} />
+      
       {secondsLeft === 0 && (
         <FinishText>
           {mode === "work"
