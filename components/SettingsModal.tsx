@@ -48,13 +48,19 @@ export default function SettingsModal({
               <Label>Tempo de Trabalho (min):</Label>
               <StyledInput
                 keyboardType="numeric"
-                value={String(localSettings.workTime)}
-                onChangeText={(val: string) =>
-                  setLocalSettings({
-                    ...localSettings,
-                    workTime: parseInt(val),
-                  })
+                value={
+                  localSettings.workTime === 0
+                    ? ""
+                    : String(localSettings.workTime)
                 }
+                onChangeText={(val: string) => {
+                  if (/^\d*$/.test(val)) {
+                    setLocalSettings({
+                      ...localSettings,
+                      workTime: val === "" ? 0 : parseInt(val),
+                    });
+                  }
+                }}
                 placeholder="25"
               />
             </FormRow>
@@ -62,13 +68,19 @@ export default function SettingsModal({
               <Label>Pausa Curta (min):</Label>
               <StyledInput
                 keyboardType="numeric"
-                value={String(localSettings.shortBreak)}
-                onChangeText={(val: string) =>
-                  setLocalSettings({
-                    ...localSettings,
-                    shortBreak: parseInt(val),
-                  })
+                value={
+                  localSettings.shortBreak === 0
+                    ? ""
+                    : String(localSettings.shortBreak)
                 }
+                onChangeText={(val: string) => {
+                  if (/^\d*$/.test(val)) {
+                    setLocalSettings({
+                      ...localSettings,
+                      shortBreak: val === "" ? 0 : parseInt(val),
+                    });
+                  }
+                }}
                 placeholder="5"
               />
             </FormRow>
@@ -76,13 +88,19 @@ export default function SettingsModal({
               <Label>Pausa Longa (min):</Label>
               <StyledInput
                 keyboardType="numeric"
-                value={String(localSettings.longBreak)}
-                onChangeText={(val: string) =>
-                  setLocalSettings({
-                    ...localSettings,
-                    longBreak: parseInt(val),
-                  })
+                value={
+                  localSettings.longBreak === 0
+                    ? ""
+                    : String(localSettings.longBreak)
                 }
+                onChangeText={(val: string) => {
+                  if (/^\d*$/.test(val)) {
+                    setLocalSettings({
+                      ...localSettings,
+                      longBreak: val === "" ? 0 : parseInt(val),
+                    });
+                  }
+                }}
                 placeholder="15"
               />
             </FormRow>
@@ -90,13 +108,19 @@ export default function SettingsModal({
               <Label>Ciclos até pausa longa:</Label>
               <StyledInput
                 keyboardType="numeric"
-                value={String(localSettings.cyclesBeforeLongBreak)}
-                onChangeText={(val: string) =>
-                  setLocalSettings({
-                    ...localSettings,
-                    cyclesBeforeLongBreak: parseInt(val),
-                  })
+                value={
+                  localSettings.cyclesBeforeLongBreak === 0
+                    ? ""
+                    : String(localSettings.cyclesBeforeLongBreak)
                 }
+                onChangeText={(val: string) => {
+                  if (/^\d*$/.test(val)) {
+                    setLocalSettings({
+                      ...localSettings,
+                      cyclesBeforeLongBreak: val === "" ? 0 : parseInt(val),
+                    });
+                  }
+                }}
                 placeholder="4"
               />
             </FormRow>
