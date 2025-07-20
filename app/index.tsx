@@ -1,18 +1,52 @@
+import SettingsModal from "@/components/SettingsModal";
+import * as Haptics from "expo-haptics";
+import { activateKeepAwake, deactivateKeepAwake } from "expo-keep-awake";
 import React, { useEffect, useRef, useState } from "react";
 import { AnimatedCircularProgress } from "react-native-circular-progress";
 import styled from "styled-components/native";
+import { useSettings } from "@/contexts/SettingsContext";
+
+interface ButtonProps {
+  disabled?: boolean;
+}
 
 export default function HomeScreen() {
-  const WORK_MINUTES = 25;
-  const SHORT_BREAK_MINUTES = 5;
-  const LONG_BREAK_MINUTES = 15;
-  const CYCLES_BEFORE_LONG_BREAK = 4;
+  const { settings } = useSettings();
+  const WORK_MINUTES = settings.workTime;
+  const SHORT_BREAK_MINUTES = settings.shortBreak;
+  const LONG_BREAK_MINUTES = settings.longBreak;
+  const CYCLES_BEFORE_LONG_BREAK = settings.cyclesBeforeLongBreak;
 
   const [mode, setMode] = useState("work");
   const [cycleCount, setCycleCount] = useState(0);
   const [secondsLeft, setSecondsLeft] = useState(WORK_MINUTES * 60);
   const [isRunning, setIsRunning] = useState(false);
   const intervalRef = useRef<any>(null);
+
+  const [showModal, setShowModal] = useState(false);
+
+  // Bloqueio de tela: mantém acordado enquanto timer está rodando
+  useEffect(() => {
+    if (isRunning) {
+      activateKeepAwake();
+    } else {
+      deactivateKeepAwake();
+    }
+    return () => {
+      deactivateKeepAwake();
+    };
+  }, [isRunning]);
+
+  // Atualiza o timer se o usuário mudar as configurações
+  useEffect(() => {
+    setSecondsLeft(
+      mode === "work"
+        ? WORK_MINUTES * 60
+        : mode === "short"
+        ? SHORT_BREAK_MINUTES * 60
+        : LONG_BREAK_MINUTES * 60
+    );
+  }, [WORK_MINUTES, SHORT_BREAK_MINUTES, LONG_BREAK_MINUTES, mode]);
 
   useEffect(() => {
     if (isRunning && secondsLeft > 0) {
@@ -26,6 +60,13 @@ export default function HomeScreen() {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
   }, [isRunning, secondsLeft]);
+
+  // Vibração nos últimos 5 segundos
+  useEffect(() => {
+    if (isRunning && secondsLeft <= 5 && secondsLeft > 0) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+    }
+  }, [secondsLeft, isRunning]);
 
   useEffect(() => {
     if (secondsLeft === 0 && isRunning) {
@@ -45,7 +86,7 @@ export default function HomeScreen() {
         setSecondsLeft(WORK_MINUTES * 60);
       }
     }
-  }, [secondsLeft, isRunning, mode, cycleCount]);
+  }, [secondsLeft, isRunning, mode, cycleCount, CYCLES_BEFORE_LONG_BREAK, LONG_BREAK_MINUTES, SHORT_BREAK_MINUTES, WORK_MINUTES]);
 
   const startTimer = () => setIsRunning(true);
   const stopTimer = () => setIsRunning(false);
@@ -92,11 +133,11 @@ export default function HomeScreen() {
         </TitleApp>
       </Header>
 
-    <CycleInfo>
+      <CycleInfo>
         Ciclo:{" "}
         {cycleCount % CYCLES_BEFORE_LONG_BREAK || CYCLES_BEFORE_LONG_BREAK} /{" "}
         {CYCLES_BEFORE_LONG_BREAK}
-    </CycleInfo>
+      </CycleInfo>
 
       <CircleContainer>
         <AnimatedCircularProgress
@@ -138,13 +179,27 @@ export default function HomeScreen() {
         <StyledButtonFull onPress={switchToWork} disabled={mode === "work"}>
           <ButtonText>Pomodoro</ButtonText>
         </StyledButtonFull>
-        <StyledButtonFull onPress={switchToShortBreak} disabled={mode === "short"}>
+        <StyledButtonFull
+          onPress={switchToShortBreak}
+          disabled={mode === "short"}
+        >
           <ButtonText>Pausa Curta</ButtonText>
         </StyledButtonFull>
-        <StyledButtonFull onPress={switchToLongBreak} disabled={mode === "long"}>
+        <StyledButtonFull
+          onPress={switchToLongBreak}
+          disabled={mode === "long"}
+        >
           <ButtonText>Pausa Longa</ButtonText>
         </StyledButtonFull>
       </ButtonCol>
+
+      <ButtonCol>
+        <StyledButtonFull onPress={() => setShowModal(true)}>
+            <ButtonText>Abrir Configurações</ButtonText>
+        </StyledButtonFull>
+      </ButtonCol>
+
+      <SettingsModal visible={showModal} onClose={() => setShowModal(false)} />
       {secondsLeft === 0 && (
         <FinishText>
           {mode === "work"
@@ -200,15 +255,15 @@ const ButtonCol = styled.View`
   gap: 12px;
 `;
 
-const StyledButton = styled.TouchableOpacity<any>`
-  background-color: ${({ disabled }) => (disabled ? "#ccc" : "#fac60c")};
+const StyledButton = styled.TouchableOpacity<ButtonProps>`
+  background-color: ${({ disabled }: ButtonProps) => (disabled ? "#ccc" : "#fac60c")};
   padding: 12px 24px;
   border-radius: 8px;
   margin: 0 8px;
 `;
 
-const StyledButtonFull = styled.TouchableOpacity<any>`
-  background-color: ${({ disabled }) => (disabled ? "#ccc" : "#fac60c")};
+const StyledButtonFull = styled.TouchableOpacity<ButtonProps>`
+  background-color: ${({ disabled }: ButtonProps) => (disabled ? "#ccc" : "#fac60c")};
   padding: 12px 24px;
   border-radius: 8px;
   margin: 0 8px;
