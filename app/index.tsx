@@ -289,5 +289,6 @@ const FinishText = styled.Text`
 const CycleInfo = styled.Text`
   font-size: 16px;
   color: #888;
-  margin-top: 4px;
+  margin-top: 10px;
+  text-align: center;
 `;
