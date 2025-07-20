@@ -1,10 +1,23 @@
 import SettingsModal from "@/components/SettingsModal";
+import { useSettings } from "@/contexts/SettingsContext";
 import * as Haptics from "expo-haptics";
 import { activateKeepAwake, deactivateKeepAwake } from "expo-keep-awake";
 import React, { useEffect, useRef, useState } from "react";
 import { AnimatedCircularProgress } from "react-native-circular-progress";
-import styled from "styled-components/native";
-import { useSettings } from "@/contexts/SettingsContext";
+import {
+  ButtonCol,
+  ButtonRow,
+  ButtonText,
+  CircleContainer,
+  Container,
+  CycleInfo,
+  FinishText,
+  Header,
+  StyledButton,
+  StyledButtonFull,
+  TimerText,
+  TitleApp,
+} from "./HomeScreen.styles";
 
 interface ButtonProps {
   disabled?: boolean;
@@ -86,7 +99,16 @@ export default function HomeScreen() {
         setSecondsLeft(WORK_MINUTES * 60);
       }
     }
-  }, [secondsLeft, isRunning, mode, cycleCount, CYCLES_BEFORE_LONG_BREAK, LONG_BREAK_MINUTES, SHORT_BREAK_MINUTES, WORK_MINUTES]);
+  }, [
+    secondsLeft,
+    isRunning,
+    mode,
+    cycleCount,
+    CYCLES_BEFORE_LONG_BREAK,
+    LONG_BREAK_MINUTES,
+    SHORT_BREAK_MINUTES,
+    WORK_MINUTES,
+  ]);
 
   const startTimer = () => setIsRunning(true);
   const stopTimer = () => setIsRunning(false);
@@ -195,7 +217,7 @@ export default function HomeScreen() {
 
       <ButtonCol>
         <StyledButtonFull onPress={() => setShowModal(true)}>
-            <ButtonText>Abrir Configurações</ButtonText>
+          <ButtonText>Abrir Configurações</ButtonText>
         </StyledButtonFull>
       </ButtonCol>
 
@@ -210,85 +232,3 @@ export default function HomeScreen() {
     </Container>
   );
 }
-const Container = styled.View`
-  flex: 1;
-  background-color: #f2f2f7;
-`;
-
-const Header = styled.View`
-  padding-top: 60px;
-  background-color: #fac60c;
-  justify-content: center;
-  align-items: center;
-`;
-
-const TitleApp = styled.Text`
-  padding: 12px 0;
-  font-size: 28px;
-  font-weight: bold;
-`;
-
-const CircleContainer = styled.View`
-  align-items: center;
-  justify-content: center;
-  margin: 32px 0 16px 0;
-`;
-
-const TimerText = styled.Text`
-  font-size: 48px;
-  font-weight: bold;
-  text-align: center;
-`;
-
-const ButtonRow = styled.View`
-  flex-direction: row;
-  justify-content: center;
-  align-items: space-between;
-  margin: 16px 20px;
-`;
-
-const ButtonCol = styled.View`
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  margin: 16px 20px;
-  gap: 12px;
-`;
-
-const StyledButton = styled.TouchableOpacity<ButtonProps>`
-  background-color: ${({ disabled }: ButtonProps) => (disabled ? "#ccc" : "#fac60c")};
-  padding: 12px 24px;
-  border-radius: 8px;
-  margin: 0 8px;
-`;
-
-const StyledButtonFull = styled.TouchableOpacity<ButtonProps>`
-  background-color: ${({ disabled }: ButtonProps) => (disabled ? "#ccc" : "#fac60c")};
-  padding: 12px 24px;
-  border-radius: 8px;
-  margin: 0 8px;
-  width: 100%;
-  text-align: center;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-
-const ButtonText = styled.Text`
-  font-size: 18px;
-  font-weight: bold;
-`;
-
-const FinishText = styled.Text`
-  font-size: 20px;
-  color: #ff3b30;
-  text-align: center;
-  margin-top: 24px;
-`;
-
-const CycleInfo = styled.Text`
-  font-size: 16px;
-  color: #888;
-  margin-top: 10px;
-  text-align: center;
-`;
