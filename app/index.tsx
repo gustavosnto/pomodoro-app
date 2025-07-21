@@ -19,7 +19,8 @@ import {
   StyledButtonFull,
   TimerText,
   TitleApp,
-} from "./HomeScreen.styles";
+} from "../styles/HomeScreen.styles";
+
 // Configuração do canal de notificação para Android
 if (Platform.OS === "android") {
   Notifications.setNotificationChannelAsync("default", {
@@ -55,7 +56,7 @@ export default function HomeScreen() {
     requestPermissions();
   }, []);
 
-  // Funções de notificação
+  // Funções de notificação com contagem regressiva
   const stopNotificationCountdown = useCallback(() => {
     if (notificationIntervalRef.current) {
       clearInterval(notificationIntervalRef.current);
@@ -268,10 +269,10 @@ export default function HomeScreen() {
           fill={percent}
           tintColor={
             mode === "work"
-              ? "#fac60c"
+              ? "#e74c3c"
               : mode === "short"
-              ? "#4cd964"
-              : "#007aff"
+              ? "#27ae60"
+              : "#3498db"
           }
           backgroundColor="#eee"
           rotation={0}

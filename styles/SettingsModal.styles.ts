@@ -48,7 +48,7 @@ export const ButtonRow = styled.View`
 `;
 
 export const StyledButtonFull = styled.TouchableOpacity<any>`
-  background-color: #fac60c;
+  background-color: #e74c3c;
   padding: 12px 24px;
   border-radius: 8px;
   margin: 0 8px;

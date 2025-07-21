@@ -11,7 +11,7 @@ import {
   ModalOverlay,
   StyledButtonFull,
   StyledInput,
-} from "./SettingsModal.styles";
+} from "../styles/SettingsModal.styles";
 
 type SettingsModalProps = {
   visible: boolean;

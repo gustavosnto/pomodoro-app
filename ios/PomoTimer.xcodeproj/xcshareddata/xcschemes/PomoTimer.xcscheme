@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-               BuildableName = "meuSaas.app"
-               BlueprintName = "meuSaas"
-               ReferencedContainer = "container:meuSaas.xcodeproj">
+               BuildableName = "PomoTimer.app"
+               BlueprintName = "PomoTimer"
+               ReferencedContainer = "container:PomoTimer.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "00E356ED1AD99517003FC87E"
-               BuildableName = "meuSaasTests.xctest"
-               BlueprintName = "meuSaasTests"
-               ReferencedContainer = "container:meuSaas.xcodeproj">
+               BuildableName = "PomoTimerTests.xctest"
+               BlueprintName = "PomoTimerTests"
+               ReferencedContainer = "container:PomoTimer.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -55,9 +55,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "meuSaas.app"
-            BlueprintName = "meuSaas"
-            ReferencedContainer = "container:meuSaas.xcodeproj">
+            BuildableName = "PomoTimer.app"
+            BlueprintName = "PomoTimer"
+            ReferencedContainer = "container:PomoTimer.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -72,9 +72,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "meuSaas.app"
-            BlueprintName = "meuSaas"
-            ReferencedContainer = "container:meuSaas.xcodeproj">
+            BuildableName = "PomoTimer.app"
+            BlueprintName = "PomoTimer"
+            ReferencedContainer = "container:PomoTimer.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
