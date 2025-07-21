@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "meuSaas",
-    "slug": "meuSaas",
+    "name": "PomoTimer",
+    "slug": "PomoTimer",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",

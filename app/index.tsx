@@ -3,8 +3,8 @@ import { useSettings } from "@/contexts/SettingsContext";
 import * as Haptics from "expo-haptics";
 import { activateKeepAwakeAsync, deactivateKeepAwake } from "expo-keep-awake";
 import * as Notifications from "expo-notifications";
-import React, { useEffect, useRef, useState } from "react";
-import { AppState } from "react-native";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { AppState, Platform } from "react-native";
 import { AnimatedCircularProgress } from "react-native-circular-progress";
 import {
   ButtonCol,
@@ -21,10 +21,12 @@ import {
   TitleApp,
 } from "./HomeScreen.styles";
 // Configuração do canal de notificação para Android
-Notifications.setNotificationChannelAsync("default", {
-  name: "Pomodoro",
-  importance: Notifications.AndroidImportance.HIGH,
-});
+if (Platform.OS === "android") {
+  Notifications.setNotificationChannelAsync("default", {
+    name: "PomoTimer",
+    importance: Notifications.AndroidImportance.HIGH,
+  });
+}
 
 export default function HomeScreen() {
   const { settings } = useSettings();
@@ -38,60 +40,115 @@ export default function HomeScreen() {
   const [secondsLeft, setSecondsLeft] = useState(WORK_MINUTES * 60);
   const [isRunning, setIsRunning] = useState(false);
   const intervalRef = useRef<any>(null);
+  const notificationIntervalRef = useRef<any>(null);
 
   const [showModal, setShowModal] = useState(false);
+
+  // Solicitar permissões de notificação
+  useEffect(() => {
+    const requestPermissions = async () => {
+      const { status } = await Notifications.requestPermissionsAsync();
+      if (status !== "granted") {
+        console.log("Notification permissions not granted");
+      }
+    };
+    requestPermissions();
+  }, []);
+
+  // Funções de notificação
+  const stopNotificationCountdown = useCallback(() => {
+    if (notificationIntervalRef.current) {
+      clearInterval(notificationIntervalRef.current);
+      notificationIntervalRef.current = null;
+    }
+    Notifications.cancelAllScheduledNotificationsAsync();
+  }, []);
+
+  const startNotificationCountdown = useCallback(() => {
+    let currentSeconds = secondsLeft;
+
+    const updateNotification = async () => {
+      if (currentSeconds > 0) {
+        const minutes = Math.floor(currentSeconds / 60)
+          .toString()
+          .padStart(2, "0");
+        const seconds = (currentSeconds % 60).toString().padStart(2, "0");
+
+        await Notifications.scheduleNotificationAsync({
+          identifier: "pomodoro-countdown",
+          content: {
+            title:
+              mode === "work"
+                ? "PomoTimer em andamento"
+                : mode === "short"
+                ? "Pausa Curta"
+                : "Pausa Longa",
+            body: `Tempo restante: ${minutes}:${seconds}`,
+            sound: false,
+            sticky: true,
+          },
+          trigger: null, // Mostra imediatamente
+        });
+
+        currentSeconds--;
+      } else {
+        stopNotificationCountdown();
+        // Notificação final
+        await Notifications.scheduleNotificationAsync({
+          content: {
+            title: "PomoTimer",
+            body:
+              mode === "work"
+                ? "Tempo de trabalho finalizado! Faça uma pausa."
+                : "Pausa finalizada! Volte ao trabalho.",
+            sound: true,
+          },
+          trigger: null,
+        });
+      }
+    };
+
+    // Primeira notificação imediata
+    updateNotification();
+
+    // Atualiza a cada segundo
+    notificationIntervalRef.current = setInterval(updateNotification, 1000);
+  }, [secondsLeft, mode, stopNotificationCountdown]);
 
   // Listener para notificação ao minimizar
   useEffect(() => {
     const subscription = AppState.addEventListener("change", (nextState) => {
       if (nextState === "background" && isRunning && secondsLeft > 0) {
-        schedulePomodoroNotification(secondsLeft, mode);
+        startNotificationCountdown();
       }
       if (nextState === "active") {
-        Notifications.cancelAllScheduledNotificationsAsync();
+        stopNotificationCountdown();
       }
     });
     return () => {
       subscription.remove();
     };
-  }, [isRunning, secondsLeft, mode]);
-
-  // Notificação persistente
-  async function schedulePomodoroNotification(seconds: number, mode: string) {
-    await Notifications.cancelAllScheduledNotificationsAsync();
-    if (seconds > 0) {
-      await Notifications.scheduleNotificationAsync({
-        content: {
-          title:
-            mode === "work"
-              ? "Pomodoro em andamento"
-              : mode === "short"
-              ? "Pausa Curta"
-              : "Pausa Longa",
-          body: `Tempo restante: ${Math.floor(seconds / 60)}:${(seconds % 60)
-            .toString()
-            .padStart(2, "0")}`,
-          sound: true,
-        },
-        trigger: { seconds, repeats: false, channelId: "default" },
-      });
-    }
-  }
+  }, [
+    isRunning,
+    secondsLeft,
+    mode,
+    startNotificationCountdown,
+    stopNotificationCountdown,
+  ]);
 
   // Bloqueio de tela: mantém acordado enquanto timer está rodando
   useEffect(() => {
     if (isRunning) {
       activateKeepAwakeAsync();
-      schedulePomodoroNotification(secondsLeft, mode);
     } else {
       deactivateKeepAwake();
-      Notifications.cancelAllScheduledNotificationsAsync();
+      stopNotificationCountdown();
     }
     return () => {
       deactivateKeepAwake();
-      Notifications.cancelAllScheduledNotificationsAsync();
+      stopNotificationCountdown();
     };
-  }, [isRunning, secondsLeft, mode]);
+  }, [isRunning, stopNotificationCountdown]);
 
   // Atualiza o timer se o usuário mudar as configurações
   useEffect(() => {
@@ -192,7 +249,7 @@ export default function HomeScreen() {
     <Container>
       <Header>
         <TitleApp>
-          {mode === "work" && "Pomodoro"}
+          {mode === "work" && "PomoTimer"}
           {mode === "short" && "Pausa Curta"}
           {mode === "long" && "Pausa Longa"}
         </TitleApp>
@@ -242,7 +299,7 @@ export default function HomeScreen() {
       </ButtonRow>
       <ButtonCol>
         <StyledButtonFull onPress={switchToWork} disabled={mode === "work"}>
-          <ButtonText>Pomodoro</ButtonText>
+          <ButtonText>PomoTimer</ButtonText>
         </StyledButtonFull>
         <StyledButtonFull
           onPress={switchToShortBreak}
@@ -265,7 +322,7 @@ export default function HomeScreen() {
       </ButtonCol>
 
       <SettingsModal visible={showModal} onClose={() => setShowModal(false)} />
-      
+
       {secondsLeft === 0 && (
         <FinishText>
           {mode === "work"

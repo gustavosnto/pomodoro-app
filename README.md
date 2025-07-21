@@ -1,6 +1,20 @@
-# Welcome to your Expo app 👋
+# PomoTimer – Expo/React Native
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Este é um aplicativo de Pomodoro moderno chamado **PomoTimer**, criado com [Expo](https://expo.dev) e React Native, focado em produtividade e experiência de usuário.
+
+## Funcionalidades
+
+- **Timer PomoTimer**: Temporizador clássico para ciclos de trabalho focado.
+- **Ciclos automáticos**: Alterna automaticamente entre trabalho, pausa curta e pausa longa, com contagem de ciclos.
+- **Configuração Personalizada**: Defina o tempo de trabalho, pausa curta, pausa longa e número de ciclos antes da pausa longa.
+- **Notificações Locais**: Receba notificações quando o tempo acabar, mesmo se o app estiver minimizado ou fechado (em build de desenvolvimento).
+- **Vibração**: Vibração nos últimos segundos do ciclo para alertar o usuário.
+- **Bloqueio de Tela**: Mantém a tela acordada enquanto o timer está rodando.
+- **Styled-components**: Interface moderna e responsiva, com componentes estilizados.
+- **Modal de Configurações**: Ajuste fácil dos tempos e ciclos, com validação de entrada.
+- **Visualização Circular**: Barra de progresso circular animada para o timer.
+- **Acessível em iOS e Android**: Suporte completo para ambos os sistemas.
+- **Persistência de Estado**: Timer continua funcionando mesmo ao alternar entre apps (notificações).
 
 ## Get started
 
@@ -10,41 +24,25 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
    npm install
    ```
 
-2. Start the app
+2. Inicie o app
 
    ```bash
    npx expo start
    ```
 
-In the output, you'll find options to open the app in a
+> **Atenção:** Para testar notificações e funcionalidades completas, use um [development build](https://docs.expo.dev/develop/development-builds/introduction/) com `npx expo run:ios` ou `npx expo run:android`. O Expo Go possui limitações para notificações.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+Você pode começar a desenvolver editando os arquivos dentro do diretório **app**. Este projeto utiliza [file-based routing](https://docs.expo.dev/router/introduction).
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## Splash Screen
 
-## Get a fresh project
+A splash screen personalizada é exibida ao abrir o app. A imagem pode ser alterada em `assets/images/splash-icon.png` e configurada em `app.json`.
 
-When you're ready, run:
+## Saiba mais
 
-```bash
-npm run reset-project
-```
+- [Documentação do Expo](https://docs.expo.dev/)
+- [Tutorial Expo](https://docs.expo.dev/tutorial/introduction/)
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+---
 
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Desenvolvido com ❤️ usando Expo, React Native e styled-components.
